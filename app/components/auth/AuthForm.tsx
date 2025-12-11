@@ -50,11 +50,14 @@ export default function AuthForm({ onSuccess, onClose }: AuthFormProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-800 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 opacity-30" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+      }}></div>
       <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        className="bg-slate-900 rounded-2xl border border-slate-700 p-8 max-w-md w-full"
+        className="relative bg-slate-900/95 backdrop-blur-md rounded-2xl border border-slate-700/50 p-8 max-w-md w-full shadow-2xl"
       >
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-white mb-2">
@@ -176,16 +179,6 @@ export default function AuthForm({ onSuccess, onClose }: AuthFormProps) {
           </button>
         </div>
 
-        {onClose && (
-          <div className="mt-4 text-center">
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-white transition-colors text-sm"
-            >
-              Continue without account
-            </button>
-          </div>
-        )}
       </motion.div>
     </div>
   )

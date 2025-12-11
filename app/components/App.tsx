@@ -7,12 +7,15 @@ import { SubscriptionService } from '../../lib/subscription-service'
 import LandingPage from './landing/LandingPage'
 import Dashboard from './dashboard/Dashboard'
 import AuthForm from './auth/AuthForm'
+import UsernamePrompt from './auth/UsernamePrompt'
 
 export default function App() {
   const [user, setUser] = useState<any>(null)
+  const [dbUser, setDbUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [showAuth, setShowAuth] = useState(false)
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [showUsernamePrompt, setShowUsernamePrompt] = useState(false)
 
   useEffect(() => {
     // Check for existing session
@@ -25,14 +28,18 @@ export default function App() {
         setShowAuth(false)
         
         // Ensure user record exists in our database
-        const existingUser = await UserService.getUserById(session.user.id)
+        let existingUser = await UserService.getUserById(session.user.id)
         if (!existingUser) {
-          await UserService.createUser({
+          existingUser = await UserService.createUser({
             id: session.user.id,
             email: session.user.email!,
             full_name: session.user.user_metadata?.full_name
           })
         }
+        
+        setDbUser(existingUser)
+
+        // Username prompt disabled - users can access dashboard without username
 
         // Create free subscription if user doesn't have one
         const subscription = await SubscriptionService.getUserSubscription(session.user.id)
@@ -41,7 +48,9 @@ export default function App() {
         }
       } else if (event === 'SIGNED_OUT') {
         setUser(null)
+        setDbUser(null)
         setShowAuth(false)
+        setShowUsernamePrompt(false)
       }
       setLoading(false)
     })
@@ -53,6 +62,13 @@ export default function App() {
     try {
       const currentUser = await AuthService.getCurrentUser()
       setUser(currentUser)
+      
+      if (currentUser) {
+        const userData = await UserService.getUserById(currentUser.id)
+        setDbUser(userData)
+        
+        // Username prompt disabled - users can access dashboard without username
+      }
     } catch (error) {
       console.error('Error checking user:', error)
     } finally {
@@ -77,7 +93,21 @@ export default function App() {
 
   const handleSignOut = () => {
     setUser(null)
+    setDbUser(null)
     setShowOnboarding(false)
+    setShowUsernamePrompt(false)
+  }
+
+  const handleUsernameSuccess = (username: string) => {
+    // Update the dbUser with the new username
+    if (dbUser) {
+      setDbUser({ ...dbUser, username })
+    }
+    setShowUsernamePrompt(false)
+  }
+
+  const handleUsernameSkip = () => {
+    setShowUsernamePrompt(false)
   }
 
   if (loading) {
@@ -88,6 +118,17 @@ export default function App() {
           <p className="text-gray-400">Loading ResumeIQ...</p>
         </div>
       </div>
+    )
+  }
+
+  // Show username prompt if user needs to set username
+  if (showUsernamePrompt && user) {
+    return (
+      <UsernamePrompt 
+        userId={user.id}
+        onSuccess={handleUsernameSuccess}
+        onSkip={handleUsernameSkip}
+      />
     )
   }
 

@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS users (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
   full_name TEXT,
+  username TEXT UNIQUE,
   credits INTEGER DEFAULT 3 NOT NULL CHECK (credits >= 0),
   total_credits_purchased INTEGER DEFAULT 0 NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -57,6 +58,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Create indexes for the users table
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_users_credits ON users(credits);
 CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);
 

@@ -2,6 +2,7 @@ export interface User {
   id: string
   email: string
   full_name?: string
+  username?: string
   credits: number
   total_credits_purchased: number
   created_at: string
@@ -12,6 +13,7 @@ export interface CreateUserData {
   id: string
   email: string
   full_name?: string
+  username?: string
 }
 
 export interface CreditTransaction {
